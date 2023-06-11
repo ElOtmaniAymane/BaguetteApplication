@@ -1,0 +1,20 @@
+<button id="edgeUpdateButton">✨ Update Edge</button>
+<div id="edgeUpdateDialogue" style="display:none">
+    <form id="edgeUpdateForm">
+        <div id="edgeFieldsContainer">
+            <input type="text" name="edgeTypeField" placeholder="Edge type">
+        </div>
+        <button id="openParenthesisButton" type="button">(</button>
+        <button id="orButton" type="button">OR</button>
+        <button id="andButton" type="button">AND</button>
+        <button id="closeParenthesisButton" type="button">)</button>
+        <button id="clearFieldsButton" type="button">Clear</button>
+
+        <br/>
+        <input type="text" id="edgeExpressionField" readonly>
+        <br/>
+        <input type="submit" id="changeTargetNodeButton" value="change-target" >
+        <input type="submit" id="changeSourceNodeButton" value="change-source" >
+        <input type="submit" id="saveModificationButton" value="save-modification" >
+    </form>
+</div>

@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: "RP Flask REST API"
+  description: "An API about graphs"
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+components:
+  schemas:
+    UserRegister:
+      type: "object"
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+        email:
+          type: "string"
+          format: "email"
+    UserLogin:
+      type: "object"
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+    Node:
+      type: "object"
+      required:
+        - user_id
+        - node_type
+        - node_name
+      properties:
+        user_id:
+          type: "string"
+        node_type:
+          type: "string"
+        node_name:
+          type: "string"
+        color:
+          type: "string"
+    Edge:
+      type: "object"
+      required:
+        - user_id
+        - edge_type
+        - source_node_id
+        - target_node_id
+      properties:
+        user_id:
+          type: "string"
+        edge_type:
+          type: "string"
+        source_node_id:
+          type: "string"
+        target_node_id:
+          type: "string"
+  parameters:
+    user_id:
+      name: "user_id"
+      description: "ID of the user"
+      in: path
+      required: True
+      schema:
+        type: "integer"
+    node_id:
+      name: "node_id"
+      description: "ID of the node to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
+    edge_id:
+      name: "edge_id"
+      description: "ID of the edge"
+      in: path
+      required: true
+      schema:
+        type: "integer"        
+paths:
+  /users/register:
+    post:
+      operationId: "users.register"
+      tags:
+        - Users
+      summary: "Register a new user"
+      requestBody:
+        description: "User to create"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "user"
+              $ref: "#/components/schemas/UserRegister"
+      responses:
+        "201":
+          description: "User successfully registered"
+  /users/login:
+    post:
+      operationId: "users.login"
+      tags:
+        - Users
+      summary: "Login a user"
+      requestBody:
+        description: "User to login"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "user"
+              $ref: "#/components/schemas/UserLogin"
+      responses:
+        "200":
+          description: "User successfully logged in"
+  /nodes:
+    get:
+      operationId: "nodes.read_all"
+      tags:
+        - "Nodes"
+      summary: "Read the list of nodes"
+      responses:
+        "200":
+          description: "Successfully read nodes list"
+    post:
+      operationId: "nodes.create"
+      tags:
+        - "Nodes"
+      summary: "Create a node"
+      requestBody:
+          description: "node to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "node"
+                $ref: "#/components/schemas/Node"
+      responses:
+        "201":
+          description: "Successfully created node"
+  /nodes/{node_id}:
+    get:
+      operationId: "nodes.read_one"
+      tags:
+        - Nodes
+      summary: "Read one node"
+      parameters:
+        - $ref: "#/components/parameters/node_id"
+      responses:
+        "200":
+          description: "Successfully read node"
+    put:
+      tags:
+        - Nodes
+      operationId: "nodes.update"
+      summary: "Update a node"
+      parameters:
+        - $ref: "#/components/parameters/node_id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "node"
+              type: "object"
+              required:
+                - node_type
+                - node_name
+              properties:
+                node_type:
+                  type: "string"
+                node_name:
+                  type: "string"
+                color:
+                  type: "string"
+      responses:
+        "200":
+          description: "Successfully updated node"
+    delete:
+      tags:
+        - Nodes
+      operationId: "nodes.delete"
+      summary: "Delete a node"
+      parameters:
+        - $ref: "#/components/parameters/node_id"
+      responses:
+        "204":
+          description: "Successfully deleted node"
+  /edges:
+    post:
+      operationId: "edges.create"
+      tags:
+        - Edges
+      summary: "Create an edge associated with a node"
+      requestBody:
+          description: "Edge to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "edge"
+                $ref: "#/components/schemas/Edge"
+      responses:
+        "201":
+          description: "Successfully created a edge"
+  /edges/{edge_id}:
+    get:
+      operationId: "edges.read_one"
+      tags:
+        - Edges
+      summary: "Read one edge"
+      parameters:
+        - $ref: "#/components/parameters/edge_id"
+      responses:
+        "200":
+          description: "Successfully read one edge"
+    put:
+      tags:
+        - Edges
+      operationId: "edges.update"
+      summary: "Update an edge"
+      parameters:
+        - $ref: "#/components/parameters/edge_id"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "edge"
+              $ref: "#/components/schemas/Edge"
+      responses:
+        "200":
+          description: "Successfully updated edge"
+    delete:
+      tags:
+        - Edges
+      operationId: "edges.delete"
+      summary: "Delete an edge"
+      parameters:
+        - $ref: "#/components/parameters/edge_id"
+      responses:
+        "204":
+          description: "Successfully deleted edge"

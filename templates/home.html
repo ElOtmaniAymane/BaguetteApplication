@@ -1,0 +1,237 @@
+<!-- templates/home.html -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RP Flask REST API</title>
+</head>
+<body>
+    <h1>
+        Hello, People!
+    </h1>
+    <ul>
+        {% for node in nodes %}
+        <li>{{ node.node_type }} {{ node.node_name }} {{ node.color }}</li>
+        {% endfor %}
+    </ul>
+    {% for node in nodes %}
+<h2>{{ node.node_name }} {{ node.node_type }} {{ node.color }}</h2>
+<ul>
+    {% for note in node.outgoing_edges %}
+    <li>
+        {{ note.source_node_id }} {{ note.target_node_id }} {{ note.edge_type }} {{ note.arrow }}
+    </li>
+    {% endfor %}
+</ul>
+{% endfor %}
+    {% if config['DEBUG'] %}
+        {% include "_debug.html" %}
+    {% endif %}
+
+</body>
+</html> -->
+
+<!-- home.html -->
+
+<!-- home.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home</title>
+
+  <!-- Include vis.js stylesheets -->
+  <link href="https://visjs.github.io/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css"/>
+
+  <!-- Include vis.js library -->
+  <script type="text/javascript" src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+  
+  <!-- Include jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    #my-network {
+        width: 100%;
+        height: 600px;
+        border: 1px solid lightgray;
+    }
+    </style>
+    <script
+        src="{{ url_for('static', filename='js/apiSave.js') }}"
+        type="module"
+    ></script>
+    <script
+    src="{{ url_for('static', filename='js/createNode.js') }}"
+    type="module"
+></script>
+    <script
+    src="{{ url_for('static', filename='js/update.js') }}"
+    type="module"
+></script>
+<script src="{{ url_for('static', filename='js/delete.js') }}"></script>
+<script
+    src="{{ url_for('static', filename='js/updateEdge.js') }}"
+    type="module"
+></script>
+<script
+    src="{{ url_for('static', filename='js/deleteEdge.js') }}"
+    type="module"
+></script>
+<script
+src="{{ url_for('static', filename='js/users.js') }}"
+type="module"
+></script>
+</head>
+
+<body>
+    <header>
+        <h1>My App</h1>
+      </header>
+    <p id="message"style="display:none"></p>
+    <h2 id="welcome-message"style="display:none"></h2>
+    <div class="update">
+
+        {% include "_update.html" %}
+
+    </div>
+    <div class="createNode">
+
+        {% include "_create_node_form.html" %}
+
+    </div>
+    <div class="updateEdge">
+
+        {% include "_updateEdge.html" %}
+
+    </div>
+    <div id="edge-dialog" style="display:none">
+        {% include "_create_edge_form.html" %}
+    </div>
+    <div id="debug"></div>
+    <div id = "edgeDelete">
+        <button id="edgeDeleteButton">✨ Delete Edge</button>
+    </div>
+    <button id="save-button">Save</button>
+  <!-- The div where the graph will be drawn -->
+  <div id="my-network"></div>
+  <p id="message"></p>
+
+  <script type="text/javascript">
+
+var nodesData = JSON.parse('{{ nodes | tojson | safe }}');
+var typeColorJson = JSON.parse('{{ type_color_json | safe }}');
+    console.log(typeColorJson);
+    // Create an array of nodes and edges for vis.js
+    var nodes = [];
+    var edges = [];
+
+    for (var i = 0; i < nodesData.length; i++) {
+      nodes.push({
+        id: nodesData[i].node_id, 
+        label: nodesData[i].node_name + " ("+ nodesData[i].node_type+")", 
+        color: nodesData[i].color,
+      });
+      
+      var outgoingEdges = nodesData[i].outgoing_edges;
+      
+      var labelCharLimit = 10;
+
+for (var j = 0; j < outgoingEdges.length; j++) {
+  var edgeLabel = outgoingEdges[j].edge_type;
+
+  // Truncate the label if necessary.
+  var truncatedLabel = edgeLabel.length > labelCharLimit
+    ? edgeLabel.substring(0, labelCharLimit - 3) + "..."
+    : edgeLabel;
+        edges.push({
+            id: outgoingEdges[j].edge_id,
+            from: outgoingEdges[j].source_node_id, 
+            to: outgoingEdges[j].target_node_id,
+            label: truncatedLabel,
+            arrows: outgoingEdges[j].arrow == 1 ? 'to' : '',
+            font: {align: 'middle'}
+        });
+      }
+    }
+
+    // Create a network
+    var container = document.getElementById('my-network');
+    var data = {
+        nodes: new vis.DataSet(nodes),
+        edges: new vis.DataSet(edges)
+    };
+    var options = {
+    interaction: {
+        dragNodes: true
+    },
+    nodes: {
+        physics: false
+    }
+};
+localStorage.removeItem('nodePositions');
+
+    var network = new vis.Network(container, data, options);
+    for (var i = 0; i < localStorage.length; i++) {
+  var key = localStorage.key(i);
+  var value = localStorage.getItem(key);
+  console.log("Clé : " + key + ", Valeur : " + value);
+}
+
+network.on("dragStart", function(params) {
+  var nodeId = params.nodes[0]; // L'id du nœud déplacé
+  console.log("Le nœud avec l'id " + nodeId + " a commencé à être déplacé.");
+  // Faites quelque chose lorsque le nœud commence à être déplacé
+});
+
+network.on("dragEnd", function(params) {
+  var nodeId = params.nodes[0]; // L'id du nœud déplacé
+  var newPosition = network.getPositions([nodeId])[nodeId]; // Nouvelle position du nœud
+  console.log("Le nœud avec l'id " + nodeId + " a été déplacé à la position:", newPosition);
+  // Faites quelque chose lorsque le nœud a fini d'être déplacé
+});
+    // Load saved node positions from local storage
+
+
+   </script>
+ 
+
+
+      <!-- Register form -->
+      <div id="register-form">
+          <h2>Sign Up</h2>
+          <form>
+              <label for="register-username">Username:</label><br>
+              <input type="text" id="register-username" name="username"><br>
+              <label for="register-password">Password:</label><br>
+              <input type="password" id="register-password" name="password"><br>
+              <label for="register-email">Email:</label><br>
+              <input type="text" id="register-email" name="email"><br>
+              <button id="register-submit">Sign Up</button>
+          </form>
+          <p>Already have an account? <a href="#" id="switch-to-login" onclick="event.preventDefault(); toggleForm();">Sign In</a></p>
+      </div>
+  
+      <!-- Login form -->
+      <div id="login-form" style="display: none;">
+          <h2>Sign In</h2>
+          <form>
+              <label for="username">Username:</label><br>
+              <input type="text" id="username" name="username"><br>
+              <label for="password">Password:</label><br>
+              <input type="password" id="password" name="password"><br>
+              <button id="login-submit">Sign In</button>
+          </form>
+          <p>Don't have an account yet? <a href="#" id="switch-to-signup" onclick="event.preventDefault(); toggleForm();">Sign Up</a></p>
+      </div>
+      <button id="logout-button">Sign out</button>
+
+   
+
+  
+  <footer>
+    <p>© 2023 My App. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+

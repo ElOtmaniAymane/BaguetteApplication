@@ -1,0 +1,17 @@
+<button id="init-create-node-button">✨ Create Node</button>
+<form id="node-create-form" style="display: none;">
+    <label>
+        <span>Node Name</span>
+        <input name="node_name" type="text" value="" />
+    </label>
+
+    <label>
+        <span>Node Type</span>
+        <input name="node_type" list="node-type-list" type="text" value="" />
+        <datalist id="node-type-list">
+            <!-- Options will be added by JavaScript -->
+        </datalist>
+    </label>
+    <button type="button" id="create-node-button">✨ Submit</button>
+    <button type="button" id="cancel-node-button">❌ Cancel</button>
+</form>
