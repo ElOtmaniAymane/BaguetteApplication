@@ -1,5 +1,5 @@
 window.onload = function() {
-    const userId = localStorage.getItem('user_id');
+    var userId = localStorage.getItem('user_id');
     if (userId) {
         const username = localStorage.getItem('username');
 
@@ -8,6 +8,8 @@ window.onload = function() {
         document.getElementById('welcome-message').style.display='block'
         document.getElementById('welcome-message').innerText="Welcome " + username +" !";
     }
+
+    console.log(localStorage.getItem("guest_id"));
 };
 
 function toggleForm() {

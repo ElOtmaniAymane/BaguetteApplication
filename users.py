@@ -3,7 +3,7 @@
 from flask import abort, jsonify
 from config import db
 
-from models import User, user_schema
+from models import Edge, Node, User, user_schema, node_schema, edge_schema
 
 def login(user):
     existing_user = User.query.filter_by(username=user.get('username')).first()
@@ -30,4 +30,51 @@ def register(user):
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'result': 'success', 'user': user_schema.dump(new_user)}), 201
+
+def export(user_id):
+    # get the user_id from session
+
+    # Get nodes and edges from database
+    nodes = Node.query.filter_by(user_id=user_id).order_by(Node.node_id).all()
+    edges = Edge.query.filter_by(user_id=user_id).all()
+
+    # Initialize schemas
+    
+
+    # Create a dict to map old node_id to new node_id
+    node_id_mapping = {node.node_id: i+1 for i, node in enumerate(nodes)}
+    edge_id_mapping = {edge.edge_id: i+1 for i, edge in enumerate(edges)}
+
+    # Prepare nodes and edges
+    prepared_nodes = []
+    prepared_edges = []
+
+    for node in nodes:
+        prepared_node = node_schema.dump(node)
+        prepared_node["node_id"] = node_id_mapping[node.node_id]
+        prepared_node.pop("user_id", None)
+        prepared_node.pop("incoming_edges", None)
+        prepared_node.pop("color", None)
+
+        prepared_node["outgoing_edges"] = []
+        
+        prepared_nodes.append(prepared_node)
+
+    for edge in edges:
+        prepared_edge = edge_schema.dump(edge)
+        prepared_edge["edge_id"] = edge_id_mapping[edge.edge_id]
+        prepared_edge["source_node_id"] = node_id_mapping[edge.source_node_id]
+        prepared_edge["target_node_id"] = node_id_mapping[edge.target_node_id]
+        prepared_edge.pop("user_id", None)
+        
+        # Add edge to corresponding node
+        for node in prepared_nodes:
+            if node["node_id"] == prepared_edge["source_node_id"]:
+                node["outgoing_edges"].append(prepared_edge)
+                break
+
+    # Convert data to json
+    result = jsonify(prepared_nodes)
+
+    return result
 

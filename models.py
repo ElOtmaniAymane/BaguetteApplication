@@ -1,7 +1,10 @@
 # models.py
 
+import atexit
+from datetime import datetime, timedelta
 from marshmallow_sqlalchemy import fields
 from marshmallow import fields as fd
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from config import db, ma
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,7 +21,17 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+class GuestUser(db.Model):
+    __tablename__ = 'guestusers'
 
+    id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+class GuestUserSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = GuestUser
+        load_instance = True
+        sqla_session = db.session
 
 class Edge(db.Model):
     __tablename__ = "edge"
@@ -86,3 +99,20 @@ edge_schema = EdgeSchema()
 
 node_schema = NodeSchema()
 nodes_schema = NodeSchema(many=True)
+
+guest_user_schema = GuestUserSchema()
+guest_users_schema = GuestUserSchema(many=True)
+
+def delete_expired_guest_users():
+    expired_time = datetime.utcnow() - timedelta(minutes=20)
+    expired_guest_users = GuestUser.query.filter(GuestUser.time < expired_time).all()
+    for guest_user in expired_guest_users:
+        db.session.delete(guest_user)
+    db.session.commit()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=delete_expired_guest_users, trigger="interval", minutes=20)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())

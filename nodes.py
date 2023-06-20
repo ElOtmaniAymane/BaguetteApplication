@@ -71,3 +71,21 @@ def delete(node_id):
             404,
             f"Node with  node_id {node_id} not found"
         )
+def delete_all(user_id):
+    # Find all nodes associated with the given user_id
+    nodes = Node.query.filter_by(user_id=user_id).all()
+
+    if nodes:
+        for node in nodes:
+            # Delete associated edges for each node
+            Edge.query.filter((Edge.source_node_id == node.node_id) | (Edge.target_node_id == node.node_id)).delete()
+            
+            # Delete the node
+            db.session.delete(node)
+        
+        db.session.commit()
+        return make_response(f"All nodes and associated edges for user_id {user_id} successfully deleted", 200)
+
+    else:
+        return make_response(f"no nodes found ", 200)
+

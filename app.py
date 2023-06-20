@@ -1,19 +1,18 @@
 # app.py
-from flask import jsonify, request
+import subprocess
+from flask import json, jsonify, request
 from flask import render_template # Remove: import Flask
 import config
+from config import db
 from flask import session, redirect, url_for
-from models import User, user_schema
 from users import login
-from werkzeug.security import generate_password_hash
-from shared import type_color_json
-
-from models import Node, nodes_schema
-
-
+from shared import type_color_json, arrow_data, edge_data
+from models import Edge, edge_schema, Node, node_schema, nodes_schema
 app = config.connex_app
 
 app.add_api(config.basedir / "swagger.yml")
+
+    
 
 # After user login or registration
 @app.route("/api/login", methods=["POST"])
@@ -46,15 +45,30 @@ def logout():
     session.pop("user_id", None)
     return redirect(url_for("home"))
 
+
+
+
 @app.route("/")
 def home():
+    
     # Only get nodes of the logged in user
     if "user_id" in session:
         nodes = Node.query.filter_by(user_id=session["user_id"]).all()
         nodes_data = nodes_schema.dump(nodes)
+    elif "guest_id" in session:
+        print("foulane")
+        nodes = Node.query.filter_by(user_id=session["guest_id"]).all()
+        nodes_data = nodes_schema.dump(nodes)
     else:
         nodes_data = []
-    return render_template("home.html", nodes=nodes_data, type_color_json=type_color_json)
+    return render_template("home.html", nodes=nodes_data, type_color_json=type_color_json
+                           , arrow_data=json.dumps(arrow_data), edge_data=json.dumps(edge_data))
 if __name__ == "__main__":
+    subprocess.Popen(['python', 'scheduler.py'])
     app.run(host="0.0.0.0", port=8001, debug=True)
 
+
+
+
+# /!\ IMPORTANT /!\ : Shut down the scheduler when exiting the app
+# atexit.register(lambda: scheduler.shutdown())

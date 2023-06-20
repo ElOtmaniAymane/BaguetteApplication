@@ -71,6 +71,13 @@ components:
       required: True
       schema:
         type: "integer"
+    guest_id:
+      name: "guest_id"
+      description: "ID of the user"
+      in: path
+      required: True
+      schema:
+        type: "string"
     node_id:
       name: "node_id"
       description: "ID of the node to get"
@@ -120,6 +127,18 @@ paths:
       responses:
         "200":
           description: "User successfully logged in"
+  /users/export/{user_id}:
+    get:
+      operationId: "users.export"
+      tags:
+        - "Users"
+      summary: "Export user's graph"
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          description: "Successfully read node"
+      
   /nodes:
     get:
       operationId: "nodes.read_all"
@@ -192,6 +211,19 @@ paths:
       responses:
         "204":
           description: "Successfully deleted node"
+  /nodes/user/{user_id}:
+    delete:
+      tags:
+        - "Nodes"
+      operationId: "nodes.delete_all"
+      summary: "delete all nodes and edges associated to a user"
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          description: "Successfully deleted node"
+        "404":
+          description: "no nodes were found for the user"
   /edges:
     post:
       operationId: "edges.create"
@@ -246,3 +278,41 @@ paths:
       responses:
         "204":
           description: "Successfully deleted edge"
+  /guestusers:
+    get:
+      operationId: "guests.read_all"
+      tags:
+        - "Guests"
+      summary: "Read the list of guests"
+      responses:
+        "200":
+          description: "Successfully read nodes list"
+    post:
+      tags:
+        - Guests
+      operationId: "guests.create"
+      summary: "Create Id of a guest"
+      responses:
+        "201":
+          description: "Successfully created guest's id"
+  /guestusers/{guest_id}:
+    put:
+      tags:
+        - Guests
+      operationId: "guests.update"
+      summary: "Update session of a guest"
+      parameters:
+        - $ref: "#/components/parameters/guest_id"
+      responses:
+        "200":
+          description: "Successfully updated guest's session"  
+    delete:
+      tags:
+        - Guests
+      operationId: "guests.delete"
+      summary: "Delete guest's session"
+      parameters:
+        - $ref: "#/components/parameters/guest_id"
+      responses:
+        "200":
+          description: "Successfully deleted guest's session"            

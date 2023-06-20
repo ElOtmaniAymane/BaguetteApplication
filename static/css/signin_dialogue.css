@@ -1,0 +1,88 @@
+#dialog {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Arrière-plan semi-transparent */
+    display:none;
+    align-items: center;
+    justify-content: center;
+}
+
+#dialog-content {
+    width: 35%;
+    height: 35%;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+#dialog-content button {
+    padding: 10px 20px;
+    background-color: #a71286;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+
+#sign-in{
+    width: 35%;
+    height: 35%;
+    background-color: beige;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+#sign-in form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+#sign-in label {
+    margin-bottom: 5px;
+}
+
+#sign-in  input[type="text"],
+#sign-in  input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+}
+
+#sign-in button {
+    padding: 10px 20px;
+    background-color: #a71286;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#sign-in button:hover {
+    background-color: #45a049;
+}
+
+#sign-in p {
+margin-top: 10px;
+}
+
+#sign-in a {
+color: blue;
+text-decoration: underline;
+cursor: pointer;
+}
