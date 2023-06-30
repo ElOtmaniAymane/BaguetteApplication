@@ -49,10 +49,12 @@
   
   <!-- Include jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"> -->
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"> -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/signin_dialogue.css') }}">
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='css/favicon.ico') }}" type="image/x-icon" />
   <!-- JS, Popper.js, and jQuery -->
   <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -63,10 +65,10 @@
         border: 1px solid lightgray;
     }
     </style>
-    <script
-        src="{{ url_for('static', filename='js/apiSave.js') }}"
+    <!-- <script
+        src="{{ url_for('static', filename='js/bootstrap.js') }}"
         type="module"
-    ></script>
+    ></script> -->
     <script
     src="{{ url_for('static', filename='js/createNode.js') }}"
     type="module"
@@ -75,7 +77,6 @@
     src="{{ url_for('static', filename='js/update.js') }}"
     type="module"
 ></script>
-<script src="{{ url_for('static', filename='js/delete.js') }}"></script>
 <script
     src="{{ url_for('static', filename='js/updateEdge.js') }}"
     type="module"
@@ -90,176 +91,239 @@ type="module"
 ></script>
 <script src="{{ url_for('static', filename='js/_signin_dialogue.js') }}"></script>
 <script src="{{ url_for('static', filename='js/clear.js') }}"></script>
+<script src="{{ url_for('static', filename='js/import.js') }}"></script>
+<script src="{{ url_for('static', filename='js/export.js') }}"></script>
+<script src="{{ url_for('static', filename='js/deleteNode.js') }}"></script>
 
 <!-- <script src="{{ url_for('static', filename='js/createEdge.js') }}"></script> -->
 <!-- <script src="menu-context.js"></script> --> 
 
 </head>
 
-<body>
-    <header>
-        <h1>My App</h1>
-      </header>
-    <p id="message"style="display:none"></p>
-    <button id="update-session-btn" style="display: none;">Update Session</button>
-    <p id="expiry-info" style="display: none;">Your session will expire in 30 minutes.</p>
+  <body class="min-h-screen bg-slate-50 dark:bg-black dark:text-white">
+    <!-- <header>
+        <div class="container-fluid">
+            <h1>My App</h1>
+            <button id="logout-button">Sign out</button>
+        </div>
+    </header> -->
+    <!-- <header class="sticky top-0 z-10 bg-gradient-to-br from-purple-900 to-purple-300 text-xl text-white "> -->
+        <header class="sticky top-0 z-10 bg-teal-700 text-white">
+          <section class="mx-auto flex max-w-6xl items-center justify-between p-4">
+            <h1 class="text-3xl font-medium">
+              <a href="#hero" class="flex items-center">
+                <img
+                  src="{{ url_for('static', filename='css/favicon.ico') }}"
+                  alt="Baguette Tool"
+                  class="mr-2 h-10 w-10"
+                />
+                <span>Baguette Tool</span>
+              </a>
+            </h1>
+            <div>
+              <button
+                id="mobile-open-button"
+                class="text-3xl focus:outline-none sm:hidden"
+              >
+                &#9776;
+              </button>
+              <nav class="hidden space-x-8 text-xl sm:block" aria-label="main">
+                <a
+                  href="#Presentation"
+                  class="shine-link hover:text-pink-600 hover:opacity-100"
+                  >Home Page</a
+                >
+                <a
+                  href="#Recherche"
+                  class="shine-link hover:text-pink-600 hover:opacity-100"
+                  >Help</a
+                >
+                <a
+                  id="logout-button"
+                  href="#Contact"
+                  class="shine-link hover:text-pink-600 hover:opacity-100"
+                  >Sign out</a
+                >
 
-    <h2 id="welcome-message"style="display:none"></h2>
-    <div class="update">
 
-        {% include "_update.html" %}
+                
+              </nav>
 
-    </div>
-    <div class="createNode">
+            </div>
+            <span id="welcome-message" class="text-xl  font-medium text-pink-200 " style="display:none"></span>
+          </section>
 
-        {% include "_create_node_form.html" %}
+        </header>
+    <main>
+        <div class="container-fluid">
+            <!-- <button id="logout-button">Sign out</button> -->
+        </div>
+        <div class="container-fluid">
+            <!-- Zone de notifications -->
+            <div id="notifications">
+                <section class="flex justify-end">
 
-    </div>
-    <div class="updateEdge">
+                    <p id="expiry-info" class="text-l font-medium text-right" style="display: none;">Your session will expire in 30 minutes. </p>
+                    <a id="update-session-btn" href="#" class="text-l font-medium text-pink-600" style="display: none; text-decoration: underline; cursor: pointer;"> Update session</a>          
+                
+                </section>
+                
+            </div>
 
-        {% include "_updateEdge.html" %}
+            <!-- Espace de travail -->
+            <section id="workspace">
+                <h2 id="welcome-message" class="text-xl font-medium text-pink-600 text-right" style="display:none"></h2>
 
-    </div>
-    <button id="clear-button">Clear</button>
-    <button id="export">Export</button>
-
-
-        {% include "_signin_dialogue.html" %}
-    <div>
-        {% include "_importbutton.html" %}
-
-    </div>
-
-    <div id="edge-dialog" >
-        {% include "_create_edge_form.html" %}
-    </div>
-    <div id="select-second-node-dialog" >
-        <p>Select the second node</p>
-        <button id="select-second-node-button">Select</button>
-    </div>
-    
-    <div id="debug"></div>
-    <div id = "edgeDelete">
-        <button id="edgeDeleteButton">✨ Delete Edge</button>
-    </div>
-    <button id="save-button">Save</button>
-  <!-- The div where the graph will be drawn -->
-  <div id="my-network"></div>
-  <p id="message"></p>
-    <!-- Modal -->
-    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exportModalLabel">Export Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <!-- Opérations de mise à jour -->
+                <div class="update">
+                    {% include "_update.html" %}
                 </div>
-                <div class="modal-body">
-                    <pre id="exportData"></pre>
+
+                <!-- Opérations de création de noeud -->
+                <div class="createNode">
+                    {% include "_create_node_form.html" %}
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" id="copyBtn" class="btn btn-primary">Copy to Clipboard</button>
+
+                <!-- Opérations de mise à jour des arêtes -->
+                <div class="updateEdge">
+                    {% include "_updateEdge.html" %}
+                </div>
+                <div id = "edgeDelete">
+                </div>
+                
+                <!-- Boutons d'action -->
+
+                {% include "_importbutton.html" %}
+                {% include "_exportbutton.html" %}
+
+                {% include "_signin_dialogue.html" %}
+                <div id="edge-dialog" >
+                    {% include "_create_edge_form.html" %}
+                </div>
+                <div id="select-second-node-dialog" >
+                    <p>Select the second node</p>
+                    <button id="select-second-node-button">Select</button>
+                </div>
+                <div id="debug"></div>
+
+            </section>
+            <div style="display: flex; width: 100%; height: 80vh;">
+                <div id="action-buttons" style="min-width: 190px; width: 10%; padding: 1em; display: flex; flex-direction: column;  gap: 1em;">
+                    <!-- Les boutons ici -->
+                    <!-- <section class="mx-auto flex-col max-w-7xl items-center justify-between p-4"> -->
+
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-4 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="init-create-node-button">✨ Create Node</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="nodeUpdateButton">✨ Update Node</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-red-600 active:bg-teal-500 dark:border-none" id="delete-node-button">❌ Delete Node</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="create-edge-button">✨ Create Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="create-arrow-button">✨ Create Arrow</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="edgeUpdateButton">✨ Update Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="edgeDeleteButton">❌ Delete Edge</button>
+                        <!-- </section> -->
+                </div>
+            
+                <div id="graph-container" style="width: 90%;">
+                    <div id="my-network" style="width: 99%; height: 80vh; border: 1px solid #9c9c9c; background-color: #fff; margin-top: 17px;" class="mt-5 mr-2 border border-solid border-slate-900 bg-white px-2 py-6 shadow-xl dark:border-gray-100 dark:bg-black rounded-xl"></div>
                 </div>
             </div>
-        </div>
-    </div>
+            <section class="mx-auto mt-4 flex max-w-6xl items-end justify-between p-4">
+                <button class="border-slate-900 w-48 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="export">📥 Export</button>
+                <button class="border-slate-900 w-48 rounded-xl border border-solid bg-pink-700 p-3 text-white hover:bg-red-600 active:bg-orange-500 dark:border-none" id="clear-button">Clear</button>
+                <button class="border-slate-900 w-48 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="import">📤 Import</button>
+            </section>
+            <!-- Modals -->
 
+              
+    </main>
 
-
-    
-  
-  <script type="text/javascript">
-
-var nodesData = JSON.parse('{{ nodes | tojson | safe }}');
-var typeColorJson = JSON.parse('{{ type_color_json | safe }}');
-var arrowData = JSON.parse('{{ arrow_data | safe }}');
-var edgeData = JSON.parse('{{ edge_data | safe }}');
-    console.log(typeColorJson);
-    console.log(edgeData)
-    // Create an array of nodes and edges for vis.js
-    var nodes = [];
-    var edges = [];
-
-    for (var i = 0; i < nodesData.length; i++) {
-      nodes.push({
-        id: nodesData[i].node_id, 
-        label: nodesData[i].node_name + " ("+ nodesData[i].node_type+")", 
-        color: nodesData[i].color,
-      });
-      
-      var outgoingEdges = nodesData[i].outgoing_edges;
-      
-      var labelCharLimit = 10;
-
-for (var j = 0; j < outgoingEdges.length; j++) {
-  var edgeLabel = outgoingEdges[j].edge_type;
-
-  // Truncate the label if necessary.
-  var truncatedLabel = edgeLabel.length > labelCharLimit
-    ? edgeLabel.substring(0, labelCharLimit - 3) + "..."
-    : edgeLabel;
-        edges.push({
-            id: outgoingEdges[j].edge_id,
-            from: outgoingEdges[j].source_node_id, 
-            to: outgoingEdges[j].target_node_id,
-            label: truncatedLabel,
-            arrows: outgoingEdges[j].arrow == 1 ? 'to' : '',
-            font: {align: 'middle'}
+    <script type="text/javascript">
+        // var nodesData = JSON.parse(localStorage.getItem('nodes'));
+        // console.log("ddd"+nodesData);
+        // if (!nodesData){nodesData = JSON.parse('{{ nodes | tojson | safe }}');}
+        var nodesData = JSON.parse('{{ nodes | tojson | safe }}');
+        var typeColorJson = JSON.parse('{{ type_color_json | safe }}');
+        var arrowData = JSON.parse('{{ arrow_data | safe }}');
+        var edgeData = JSON.parse('{{ edge_data | safe }}');
+        // const userId = localStorage.getItem('user_id') || localStorage.getItem('guest_id');  // Retrieve the user_id or guest_id from localStorage
+        
+            console.log(typeColorJson);
+            console.log(edgeData)
+            // Create an array of nodes and edges for vis.js
+            var nodes = [];
+            var edges = [];
+        
+            for (var i = 0; i < nodesData.length; i++) {
+              nodes.push({
+                id: nodesData[i].node_id, 
+                label: nodesData[i].node_name + " ("+ nodesData[i].node_type+")", 
+                color: nodesData[i].color,
+              });
+              
+              var outgoingEdges = nodesData[i].outgoing_edges;
+              
+              var labelCharLimit = 10;
+        
+        for (var j = 0; j < outgoingEdges.length; j++) {
+          var edgeLabel = outgoingEdges[j].edge_type;
+        
+          // Truncate the label if necessary.
+          var truncatedLabel = edgeLabel.length > labelCharLimit
+            ? edgeLabel.substring(0, labelCharLimit - 3) + "..."
+            : edgeLabel;
+                edges.push({
+                    id: outgoingEdges[j].edge_id,
+                    from: outgoingEdges[j].source_node_id, 
+                    to: outgoingEdges[j].target_node_id,
+                    label: truncatedLabel,
+                    arrows: outgoingEdges[j].arrow == 1 ? 'to' : '',
+                    font: {align: 'middle'}
+                });
+              }
+            }
+        
+            // Create a network
+            var container = document.getElementById('my-network');
+            var data = {
+                nodes: new vis.DataSet(nodes),
+                edges: new vis.DataSet(edges)
+            };
+            var options = {
+            interaction: {
+                dragNodes: true
+            },
+            nodes: {
+                physics: false
+            }
+        };
+        
+            var network = new vis.Network(container, data, options);
+            for (var i = 0; i < localStorage.length; i++) {
+          var key = localStorage.key(i);
+          var value = localStorage.getItem(key);
+          console.log("Clé : " + key + ", Valeur : " + value);
+        }
+        
+        network.on("dragStart", function(params) {
+          var nodeId = params.nodes[0]; // L'id du nœud déplacé
+          console.log("Le nœud avec l'id " + nodeId + " a commencé à être déplacé.");
+          // Faites quelque chose lorsque le nœud commence à être déplacé
         });
-      }
-    }
-
-    // Create a network
-    var container = document.getElementById('my-network');
-    var data = {
-        nodes: new vis.DataSet(nodes),
-        edges: new vis.DataSet(edges)
-    };
-    var options = {
-    interaction: {
-        dragNodes: true
-    },
-    nodes: {
-        physics: false
-    }
-};
-
-    var network = new vis.Network(container, data, options);
-    for (var i = 0; i < localStorage.length; i++) {
-  var key = localStorage.key(i);
-  var value = localStorage.getItem(key);
-  console.log("Clé : " + key + ", Valeur : " + value);
-}
-
-network.on("dragStart", function(params) {
-  var nodeId = params.nodes[0]; // L'id du nœud déplacé
-  console.log("Le nœud avec l'id " + nodeId + " a commencé à être déplacé.");
-  // Faites quelque chose lorsque le nœud commence à être déplacé
-});
-
-network.on("dragEnd", function(params) {
-  var nodeId = params.nodes[0]; // L'id du nœud déplacé
-  var newPosition = network.getPositions([nodeId])[nodeId]; // Nouvelle position du nœud
-  console.log("Le nœud avec l'id " + nodeId + " a été déplacé à la position:", newPosition);
-  // Faites quelque chose lorsque le nœud a fini d'être déplacé
-});
-    // Load saved node positions from local storage
-
-   </script>
- 
-
-
-
-
- <button id="logout-button">Sign out</button>
-
-  
-  <footer>
-    <p>© 2023 My App. All rights reserved.</p>
-  </footer>
+        
+        network.on("dragEnd", function(params) {
+          var nodeId = params.nodes[0]; // L'id du nœud déplacé
+          var newPosition = network.getPositions([nodeId])[nodeId]; // Nouvelle position du nœud
+          console.log("Le nœud avec l'id " + nodeId + " a été déplacé à la position:", newPosition);
+          // Faites quelque chose lorsque le nœud a fini d'être déplacé
+        });
+            // Load saved node positions from local storage
+        
+        </script>
+                            
+    <footer>
+        <div class="container">
+            <p>© 2023 My App. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
 

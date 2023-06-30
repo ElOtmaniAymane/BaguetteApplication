@@ -1,15 +1,18 @@
 window.onload = function() {
-    var userId = localStorage.getItem('user_id');
+    var userId = localStorage.getItem('user_id') ;  // Retrieve the user_id or guest_id from localStorage
     if (userId) {
         const username = localStorage.getItem('username');
 
         document.getElementById('login-form').style.display = 'none';
         document.getElementById('register-form').style.display = 'none';
-        document.getElementById('welcome-message').style.display='block'
+        document.getElementById('welcome-message').style.display='inline-block'
         document.getElementById('welcome-message').innerText="Welcome " + username +" !";
     }
+    else {
+        userId = localStorage.getItem('guest_id');
+        console.log(localStorage.getItem('guest_id'));
+    }
 
-    console.log(localStorage.getItem("guest_id"));
 };
 
 function toggleForm() {
@@ -113,6 +116,7 @@ logoutButton.addEventListener('click', function() {
             // Remove user_id from localStorage
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
+            localStorage.removeItem('nodes');
 
             alert('Successfully logged out');
             // Redirect to login page or home page

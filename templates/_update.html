@@ -1,23 +1,29 @@
-<div id="node-dialog" class="dialog-overlay" style="display: none;">
-    <div class="dialog-content">
-        <form id="node-update-form">
-            <label for="node_name">Node Name:</label><br>
-            <input type="text" id="node_name" name="node_name"><br>
-            <label for="color">Color:</label><br>
-            <input type="text" id="color" name="color"><br>
-            <label for="node_type">Node Type:</label><br>
-            <input type="text" id="node_type" name="node_type"><br>
-            <input type="submit" value="Update Node">
-        </form>
-    </div>
+<div id="node-dialog" class="dialog-overlay" style="display: none">
+  <div class="dialog-content">
+    <form id="node-update-form">
+      <label for="node_name">Node Name:</label><br />
+      <input type="text" id="node_name" name="node_name" /><br />
+      <label for="color">Color:</label><br />
+      <input type="text" id="color" name="color" /><br />
+      <!-- <label for="node_type" style="display:none;">Node Type:</label><br />
+      <input type="text" id="node_type" style="display:none;" name="node_type"  /><br /> -->
+      <input type="submit" value="Update Node" />
+    </form>
+  </div>
 </div>
 
-
-
-<div id="context-menu" class="context-menu" style="display:none;">
-    <div class="context-menu-item" id="updateNode" data-option="Update">Update</div>
-    <div class="context-menu-item" id="deleteNode" data-option="Delete">Delete</div>
-        <div class="context-menu-item" id="createEdge" data-option="createEdge">Create Edge</div>
-        <div class="context-menu-item" id="createArrow" data-option="Directory">Create Arrow</div>
-        <!-- <div class="context-menu-item" data-option="HandleFile">HandleFile</div> -->
+<div id="context-menu" class="context-menu" style="display: none">
+  <div class="context-menu-item" id="updateNode" data-option="Update">
+    Update
+  </div>
+  <div class="context-menu-item" id="deleteNode" data-option="Delete">
+    Delete
+  </div>
+  <div class="context-menu-item" id="createEdge" data-option="createEdge">
+    Create Edge
+  </div>
+  <div class="context-menu-item" id="createArrow" data-option="Directory">
+    Create Arrow
+  </div>
+  <!-- <div class="context-menu-item" data-option="HandleFile">HandleFile</div> -->
 </div>

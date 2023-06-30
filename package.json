@@ -1,0 +1,18 @@
+{
+  "name": "flaskgraph",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "tailwind": "npx tailwindcss -i ./src/input.css -o ./static/css/styles.css --watch",
+    "prettier": "npx prettier --write **/*.html",
+    "format": "prettier --write 'static/**/*.js'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier-plugin-tailwindcss": "^0.3.0"
+  }
+
+}

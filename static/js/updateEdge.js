@@ -14,7 +14,7 @@ document.getElementById('edgeUpdateButton').addEventListener('click', function()
 });
 
 // Écoute de l'événement selectEdge du réseau
-network.on("selectEdge", function(params) {
+network.once("selectEdge", function(params) {
     if (params.edges.length > 0) {
         var edgeId = params.edges[0];  // Get selected edge ID
         var edgeData = data.edges.get(edgeId);  // Get edge data

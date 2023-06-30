@@ -103,16 +103,3 @@ nodes_schema = NodeSchema(many=True)
 guest_user_schema = GuestUserSchema()
 guest_users_schema = GuestUserSchema(many=True)
 
-def delete_expired_guest_users():
-    expired_time = datetime.utcnow() - timedelta(minutes=20)
-    expired_guest_users = GuestUser.query.filter(GuestUser.time < expired_time).all()
-    for guest_user in expired_guest_users:
-        db.session.delete(guest_user)
-    db.session.commit()
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=delete_expired_guest_users, trigger="interval", minutes=20)
-scheduler.start()
-
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())

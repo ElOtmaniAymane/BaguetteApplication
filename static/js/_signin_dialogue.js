@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const signInForm = document.getElementById('sign-in');
     const signInBtn = document.getElementById('sign-in-btn');
     const continueBtn = document.getElementById('continue-btn');
-    const updateBtn = document.getElementById('update-session-btn');
+    const updateBtn = document.getElementById("update-session-btn");
     const expiryInfo = document.getElementById('expiry-info');
 
     let timeoutId;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         let minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
         let seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
         expiryInfo.textContent = `Your session will expire in ${minutes} minutes and ${seconds} seconds.`;
-        expiryInfo.style.display = 'block';
+        expiryInfo.style.display = 'flex';
     
         // Clear the previous timer if there is one
         if (timeoutId) {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
     
             if (remainingTime > 0) {
-                expiryInfo.textContent = `Your session will expire in ${minutes} minutes and ${seconds} seconds.`;
+                expiryInfo.textContent = `Your session will expire in ${minutes} minutes.`;
             } else {
                 expiryInfo.textContent = `Your session has expired.`;
                 fetch(`/api/guestusers/${localStorage.getItem('guest_id')}`, {
@@ -54,7 +54,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
     if (!userId) {
         if (guestId) {
             startTimer();
-            updateBtn.style.display = 'block';
+            updateBtn.style.display = 'flex';
+            updateBtn.addEventListener('click', function() {
+                console.log("ghadi tfi9");
+                fetch(`/api/guestusers/${localStorage.getItem('guest_id')}`, {
+                    method: 'PUT',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    localStorage.setItem('expiryTimestamp', Date.now() + 30 * 60 * 1000);
+                    startTimer();
+                });
+            });
         } else {
             dialog.style.display="flex";
             signInBtn.addEventListener('click', function() {
@@ -69,24 +80,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 })
                 .then(response => response.json())
                 .then(data => {
-                  console.log(data.new_id + "ddd");
-                  localStorage.setItem('guest_id', data.new_id);
-                  console.log(localStorage.getItem('guest_id'))
-                  startTimer();
-                  updateBtn.style.display = 'block';
+                    console.log(data.new_id + "ddd");
+                    localStorage.setItem('guest_id', data.new_id);
+                    localStorage.getItem('guest_id');
+                    startTimer();
+                    updateBtn.style.display = 'block';
+                }).then(() => {
+                    location.reload(true);
                 });
             });
 
-            updateBtn.addEventListener('click', function() {
-                fetch(`/api/guestusers/${localStorage.getItem('guest_id')}`, {
-                    method: 'PUT',
-                })
-                .then(response => response.json())
-                .then(data => {
-                    localStorage.setItem('expiryTimestamp', Date.now() + 30 * 60 * 1000);
-                    startTimer();
-                });
-            });
+
         }
     }
 });

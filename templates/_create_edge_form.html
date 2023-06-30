@@ -1,23 +1,26 @@
 <form id="edge-form">
-    <select id="edge-type-select" name="edge_type"></select>
+  <div id="type-selectors">
+    <select id="edge-type-select-0" class="border-slate-900 w-40 rounded-3xl border border-solid bg-gray-300 p-3 text-black hover:bg-teal-600 active:bg-teal-500 dark:border-none" name="edge_type"></select>
+  </div>
 
-    <div id="edge-fields">
-        <input type="text" name="edge_type" placeholder="Edge type">
-    </div>
-    <div id="button-row-1">
-        <button id="open-parenthesis-button" type="button">(</button>
-        <button id="or-button" type="button">|</button>
-        <button id="and-button" type="button">&</button>
-        <button id="close-parenthesis-button" type="button">)</button>
-    </div>
-    <div id="button-row-2">
-        <button id="add-type-button" type="button">Add Type</button>
-        <button id="clear-button" type="button">Clear</button>
-    </div>
-    <input type="text" id="edge-expression" >
-    <input type="submit" id="add-edge" value="Add Edge">
-    <input type="submit" id="create-edge1" value="create">
+  <button id="add-type-button" class="border-slate-900 mt-4 w-40 rounded-3xl border border-solid bg-lime-400 p-1 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none"  type="button">Add Type</button>
+  <button id="remove-type-button" class="border-slate-900 w-40 rounded-3xl mt-4 border border-solid bg-red-700 p-1 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none"  type="button">Remove Type</button>
+
+  <input type="submit" id="create-edge" value="Create Edge" />
 </form>
 
 
-
+<!-- <form id="edge-form" style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+    <div id="type-selectors" style="width: 100%; display: flex; justify-content: space-around;">
+      <label for="edge-type-select-0">Select Edge Type:</label>
+      <select id="edge-type-select-0" class="border-slate-900 w-40 rounded-3xl border border-solid bg-gray-300 p-3 text-black hover:bg-teal-600 active:bg-teal-500 dark:border-none" name="edge_type"></select>
+    </div>
+  
+    <div style="display: flex; justify-content: space-between; width: 90%;">
+      <button id="add-type-button" class="border-slate-900 mt-4 w-40 rounded-3xl border border-solid bg-lime-400 p-1 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none transition-all duration-300 ease-in-out transform hover:scale-105"  type="button">Add Type</button>
+      <button id="remove-type-button" class="border-slate-900 w-40 rounded-3xl border border-solid bg-red-700 p-1 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none transition-all duration-300 ease-in-out transform hover:scale-105"  type="button">Remove Type</button>
+    </div>
+  
+    <input type="submit" id="create-edge" value="Create Edge" class="py-2 px-4 mt-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all duration-300 ease-in-out transform hover:scale-105" />
+  </form> -->
+  

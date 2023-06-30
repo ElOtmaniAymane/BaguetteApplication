@@ -17,7 +17,8 @@ const NetworkContextMenu = (function() {
     // const submitButtonCreateArrow = formCreateEdge.querySelector('input[type="submit"]');
     const contextMenuCreateEdgeItem = document.getElementById('createEdge'); // Assuming you have this menu item
     const contextMenuCreateArrowItem = document.getElementById('createArrow'); // Assuming you have this menu item
-    
+    const dialog = document.getElementById('select-second-node-dialog');
+
     const edgeDialog = document.getElementById('edge-dialog');
     const edgeTypeSelect = document.getElementById('edge-type-select');
 
@@ -41,27 +42,59 @@ const NetworkContextMenu = (function() {
         if (nodeId) {
             selectedNode = nodeId;
             contextMenu.style.display = 'block';
-            contextMenu.style.left = `${params.pointer.DOM.x}px`;
-            contextMenu.style.top = `${params.pointer.DOM.y + 200}px`;
+            contextMenu.style.left = `${params.pointer.DOM.x +190}px`;
+            contextMenu.style.top = `${params.pointer.DOM.y}px`;
         }
         document.addEventListener('click', hideContextMenuIfClickedOutside);
     }
-
-    function handleUpdateClick() {
-        if (selectedNode) {
-            showUpdateForm(selectedNode);
+    var updateNodeButton = document.getElementById('nodeUpdateButton');
+    updateNodeButton.addEventListener('click', handleUpdateButtonClick);
+    function handleUpdateButtonClick() {
+        // Change the cursor
+        document.body.style.cursor = 'crosshair';
+    
+        // Add a one-time event listener for the network
+        network.once("click", function(params) {
+            // Check if a node was clicked
+            if (params.nodes.length > 0) {
+                // If a node was clicked, use its id as the selected node
+                selectedNode = params.nodes[0];
+    
+                // Call the handleCreateEdgeOrArrowClick function
+                handleUpdateClick(selectedNode);
+            }
+    
+            // Change the cursor back to default
+            document.body.style.cursor = 'auto';
+        });
+        
+    }
+    function handleUpdateClick(node) {
+        var nodeToUse = node || selectedNode;
+        console.log("houna");
+        if (nodeToUse) {
+            
+            showUpdateForm(nodeToUse);
             contextMenu.style.display = 'none';
+            const position = network.getPositions([nodeToUse])[nodeToUse];
+    
+            const DOMPosition = network.canvasToDOM(position);
+            nodeDialog.style.left = `${DOMPosition.x + 180}px`;
+            nodeDialog.style.top = `${DOMPosition.y}px`;
             nodeDialog.style.display = 'block';
-            nodeDialog.style.left = contextMenu.style.left;
-            nodeDialog.style.top = contextMenu.style.top;
+
         }
     }
 
     function handleFormClick(event) {
         const isClickInside = nodeDialog.contains(event.target);
         const isClickOnContextMenu = contextMenu.contains(event.target);
-        if (!isClickInside && !isClickOnContextMenu) {
+        if (!isClickInside && !isClickOnContextMenu ) {
             nodeDialog.style.display = 'none';
+            contextMenu.style.display = 'none';
+            resetEdgeForm();
+            document.removeEventListener('click', handleFormClick);
+
         }
     }
 
@@ -71,7 +104,7 @@ const NetworkContextMenu = (function() {
         if (nodeData) {
             nodeData.node_name = form.node_name.value;
             nodeData.color = form.color.value;
-            nodeData.node_type = form.node_type.value;
+            // nodeData.node_type = form.node_type.value;
             var newNode = { 
                 id: selectedNode,
                 label: `${nodeData.node_name} (${nodeData.node_type})`,
@@ -115,8 +148,11 @@ const NetworkContextMenu = (function() {
         if (nodeData) {
             form.node_name.value = nodeData.node_name;
             form.color.value = nodeData.color;
-            form.node_type.value = nodeData.node_type;
-            document.addEventListener('click', handleFormClick);
+            // form.node_type.value = nodeData.node_type;
+            setTimeout(function() {
+                document.addEventListener('click', handleFormClick);
+                edgeSecondFormClickListenerRegistered = true;
+            }, 100);
             submitButton.onclick = handleSubmitClick;
         }
     }
@@ -157,65 +193,301 @@ const NetworkContextMenu = (function() {
             contextMenu.style.display = 'none';
         }
     }
+    const EDGE = 0;
+    const ARROW = 1;
     let selectedSourceNode = null;
     let selectedTargetNode = null;
     let isSelectingSecondNode = false;
     let edgeFormClickListenerRegistered = false;
+    let edgeSecondFormClickListenerRegistered = false;
+    let currentActionType = EDGE;
+    let typeSelectorCount = 0;
+    let sourceNodeType = null;
+    let targetNodeType = null;
 
+    // Helper Functions
     function getNodeTypeFromLabel(label) {
         const labelParts = label.split(" (");
-        const nodeType = labelParts[1].slice(0, -1);
-        return nodeType;
+        return labelParts[1].slice(0, -1);
+    }
+
+    function resetEdgeForm() {
+        // selectedSourceNode = null;
+        // selectedTargetNode = null;
+        // isSelectingSecondNode = false;
+        // edgeFormClickListenerRegistered = false;
+        // edgeSecondFormClickListenerRegistered = false;
+        // currentActionType = EDGE;
+        // typeSelectorCount = 0;
+        // sourceNodeType = null;
+        // targetNodeType = null;
     }
     
-    function handleCreateEdgeClick() {
-        if (selectedNode) {
-            showCreateEdgeOrArrowForm(selectedNode, 0);
-            contextMenu.style.display = 'none';
-            selectedSourceNode = selectedNode;
+    function populateEdgeTypeSelect(sourceNodeType, targetNodeType, arrow, selectId) {
+        console.log(arrowData);
+        const edgeTypeSelect = document.getElementById(selectId);
+        edgeTypeSelect.innerHTML = '';
     
+        let possibleEdgeTypes;
+        if (arrow == 1) {  // si c'est une flèche, utiliser arrowData
+            possibleEdgeTypes = arrowData.filter(edge => {
+                // Diviser les types de edge en listes de types individuels
+                const edgeSourceTypes = edge[1].split(' | ');
+                const edgeTargetTypes = edge[2].split(' | ');
+                
+                // Vérifier si le type de nœud source ou cible est présent dans les types de edge
+                return edgeSourceTypes.includes(sourceNodeType) && edgeTargetTypes.includes(targetNodeType);
+            });
+        } else {  // si c'est une arête, utiliser edgeData
+            possibleEdgeTypes = edgeData.filter(edge => 
+                (edge[1].includes(sourceNodeType) || edge[1].includes(targetNodeType)) &&
+                (edge[2].includes(sourceNodeType) || edge[2].includes(targetNodeType))
+            );
+        }
+    
+        for (let edge of possibleEdgeTypes) {
+            const option = document.createElement('option');
+            option.value = edge[0];
+            option.text = edge[0];
+            edgeTypeSelect.appendChild(option);
+        }
+    }
+    function createEdge(sourceNodeId, targetNodeId, edgeExpression, arrow) {
+        var edgeFormule = {
+            arrow: arrow,
+            edge_type: edgeExpression,
+            source_node_id: sourceNodeId.toString(),
+            target_node_id: targetNodeId.toString(),
+            user_id: userId, // Retrieve the user_id from localStorage
+    
+        }
+        
+        $.ajax({
+            url: '/api/edges',  // Your API endpoint to create the edge
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(edgeFormule),
+            success: function(response) {
+                try {
+                    data.edges.add({
+                        id:edgeFormule.edge_id,
+                        from: edgeFormule.source_node_id, 
+                        to: edgeFormule.target_node_id,
+                        label: edgeFormule.edge_type,
+                        arrows: edgeFormule.arrow == 1 ? 'to' : '',
+                        font: {align: 'middle'}
+                      });
+                    resetEdgeForm()
+                } catch (error) {
+                    alert("Something Went Wrong : edge's creation failed")
+                }  
+    
+    
+                // network.setData(data);
+    
+                console.log('Success!');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error: ', textStatus, ', Details: ', errorThrown);
+                console.error('Response: ', jqXHR.responseText);
+            }
+        });
+    }
+    function showCreateEdgeOrArrowForm(nodeId, arrow) {
+        if (nodeId) {
+            const submitButtonCreateEdge = document.getElementById('create-edge');
+            const edgeTypeSelect = document.getElementById(`edge-type-select-0`);
+    
+            if (arrow == 0) {
+                submitButtonCreateEdge.value = "Add Edge";
+            }
+            else {
+                submitButtonCreateEdge.value = "Add Arrow";
+            }
+    
+            edgeTypeSelect.value = '';
+            const sourceNodeType = getNodeTypeFromLabel(data.nodes.get(nodeId).label);  
+            populateEdgeTypeSelect(sourceNodeType, sourceNodeType, arrow, edgeTypeSelect.id);
+    
+            // Reset number of type selectors
+            typeSelectorCount = 0;
+    
+            // Clear out any extra type selectors
+            const typeSelectorsDiv = document.getElementById('type-selectors');
+            while (typeSelectorsDiv.children.length > 1) {
+                typeSelectorsDiv.removeChild(typeSelectorsDiv.lastChild);
+            }
+    
+
+        }
+    }
+    function handleCreateEdgeOrArrowClick(arrow, selectedNodeInput) {
+        // Utilisez selectedNodeInput s'il est fourni, sinon utilisez selectedNode
+        var nodeToUse = selectedNodeInput || selectedNode;
+    
+        if (nodeToUse) {
+    
+            showCreateEdgeOrArrowForm(nodeToUse, arrow);
+            contextMenu.style.display = 'none';
+            selectedSourceNode = nodeToUse;
+            currentActionType = arrow;
             // Get the position of the node
-            const position = network.getPositions([selectedNode])[selectedNode];
+            const position = network.getPositions([nodeToUse])[nodeToUse];
     
             // Convert the position to DOM coordinates
             const DOMPosition = network.canvasToDOM(position);
     
             // Get the dialog
-            const dialog = document.getElementById('select-second-node-dialog');
     
             // Position the dialog
-            dialog.style.left = `${DOMPosition.x}px`;
-            dialog.style.top = `${DOMPosition.y + 180}px`;
+            dialog.style.left = `${DOMPosition.x + 180}px`;
+            dialog.style.top = `${DOMPosition.y}px`;
     
             // Show the dialog
             dialog.style.display = 'block';
+            if (!edgeFormClickListenerRegistered) {
+                console.log("waterrr");
+                // Add a delay before registering the click event
+                setTimeout(function() {
+                    document.addEventListener('click', handleSecondEdgeFormClickOutside);
+                    edgeSecondFormClickListenerRegistered = true;
+                }, 100);
+            }
+    
+            // Si selectedNodeInput a été fourni, vous pouvez ajouter des actions supplémentaires ici
+
         }
     }
+    // Select the new button
+    function handleButtonClick(actionType) {
+        // Change the cursor
+        document.body.style.cursor = 'crosshair';
     
+        // Add a one-time event listener for the network
+        network.once("click", function(params) {
+            // Check if a node was clicked
+            if (params.nodes.length > 0) {
+                // If a node was clicked, use its id as the selected node
+                selectedNode = params.nodes[0];
+    
+                // Call the handleCreateEdgeOrArrowClick function
+                handleCreateEdgeOrArrowClick(actionType, selectedNode);
+            }
+    
+            // Change the cursor back to default
+            document.body.style.cursor = 'auto';
+        });
+    }
+    
+    var createEdgeButton = document.getElementById('create-edge-button');
+    var createArrowButton = document.getElementById('create-arrow-button');
+    
+    // Add an event listener for the buttons
+    createEdgeButton.addEventListener('click', function() { handleButtonClick(EDGE); });
+    createArrowButton.addEventListener('click', function() { handleButtonClick(ARROW); });
+    
+    function handleCreateEdgeClick() {
+        handleCreateEdgeOrArrowClick(EDGE)
+    }
+    function handleCreateArrowClick() {
+        handleCreateEdgeOrArrowClick(ARROW)
+    }
     function handleEdgeFormClick(event) {
+        console.log("fireer");
         const isClickInside = edgeDialog.contains(event.target);
-        const isClickOnContextMenu = contextMenu.contains(event.target);
-        if (!isClickInside && !isClickOnContextMenu) {
+        if (!isClickInside ) {
             edgeDialog.style.display = 'none';
             document.removeEventListener('click', handleEdgeFormClick);
             edgeFormClickListenerRegistered = false;
+            resetEdgeForm();
         }
     }
+    function handleSecondEdgeFormClickOutside(event) {
+        console.log("fireer");
+        const isClickOnsecond = dialog.contains(event.target);
+        if (!isClickOnsecond) {
+            dialog.style.display = 'none';
+            document.removeEventListener('click', handleSecondEdgeFormClickOutside);
+            edgeSecondFormClickListenerRegistered = false;
+            resetEdgeForm();
+        }
+    }
+    function handleAddTypeButtonClick() {
+        const newSelect = document.createElement('select');
+        typeSelectorCount++;
+        console.log(typeSelectorCount);
+        newSelect.id = `edge-type-select-${typeSelectorCount}`;
+        newSelect.name = 'edge_type';
+        newSelect.className = "border-slate-900 w-40 rounded-3xl border border-solid bg-gray-300 p-3 text-black hover:bg-teal-600 active:bg-teal-500 dark:border-none";
+        document.getElementById('type-selectors').appendChild(newSelect);
+
+        // Populate new select element
+        populateEdgeTypeSelect(sourceNodeType, targetNodeType, currentActionType, newSelect.id);
     
-    document.getElementById('select-second-node-button').addEventListener('click', function(event) {
+        // Add new select element to DOM
+    
+    }
+
+    function handleRemoveTypeButtonClick(){
+        if (typeSelectorCount > 0) {
+            // Remove last select element from DOM
+            const lastSelect = document.getElementById(`edge-type-select-${typeSelectorCount}`);
+            document.getElementById('type-selectors').removeChild(lastSelect);
+    
+            typeSelectorCount--;
+        }
+    }
+
+    function handleCreateEdgeButtonClick(event){
+        event.preventDefault();
+
+        // Create edge expression from all select elements
+        let edgeExpression = '';
+        for (let i = 0; i < typeSelectorCount + 1; i++) {
+            edgeExpression += document.getElementById(`edge-type-select-${i}`).value;
+    
+            // Add '|' operator between types, but not after the last type
+            if (i < typeSelectorCount ) {
+                edgeExpression += ' | ';
+            }
+        }
+    
+        // Check if all choices are distinct and not empty
+        let selectValues = [];
+        for (let i = 0; i < typeSelectorCount + 1; i++) {
+            const value = document.getElementById(`edge-type-select-${i}`).value;
+            if (value === '' || selectValues.includes(value)) {
+                // Handle error (e.g. show an alert to the user)
+                alert('All choices must be distinct and not empty');
+                return;
+            }
+            selectValues.push(value);
+        }
+    
+        // Create edge
+        createEdge(selectedSourceNode, selectedTargetNode, edgeExpression, currentActionType);
+        edgeDialog.style.display = "none";
+    }
+
+
+    
+    function handleSelectSecondNodeButtonClick() {
         // Hide the dialog
         document.getElementById('select-second-node-dialog').style.display = 'none';
-    
+
         // Change cursor
         document.body.style.cursor = 'crosshair';
     
         // Set the state to selecting the second node
         isSelectingSecondNode = true;
-        network.on('click', function(params) {
-            handleNodeClickForEdge(params, 0);
-        });
-        
-    });
+        const clickHandler = function(params) {
+            handleNodeClickForEdge(params, currentActionType);
+            network.off('click', clickHandler);  // Remove the event listener
+        };
+    
+        network.on('click', clickHandler);
+    }
+
     
     function handleNodeClickForEdge(params, arrow) {
         console.log("reda");
@@ -229,174 +501,49 @@ const NetworkContextMenu = (function() {
             isSelectingSecondNode = false;
     
             // Call API to create edge
-            const sourceNodeType = getNodeTypeFromLabel(data.nodes.get(selectedSourceNode).label);  
-            const targetNodeType = getNodeTypeFromLabel(data.nodes.get(selectedTargetNode).label);  
-            populateEdgeTypeSelect(sourceNodeType, targetNodeType);
+    
+            sourceNodeType = getNodeTypeFromLabel(data.nodes.get(selectedSourceNode).label);  
+            targetNodeType = getNodeTypeFromLabel(data.nodes.get(selectedTargetNode).label);  
+    
+            const selectId = `edge-type-select-${typeSelectorCount}`;
+            populateEdgeTypeSelect(sourceNodeType, targetNodeType, arrow, selectId);
     
             // Show the dialog to select edge type and create edge
             edgeDialog.style.left = `${params.pointer.DOM.x}px`;
             edgeDialog.style.top = `${params.pointer.DOM.y}px`;
             edgeDialog.style.display = 'block';
-            dataDisplay2.style.display = 'block';
-            dataDisplay2.innerHTML = "raha khdama"
+    
+            if (!edgeFormClickListenerRegistered) {
+                console.log("waterrr");
+                // Add a delay before registering the click event
+                setTimeout(function() {
+                    document.addEventListener('click', handleEdgeFormClick);
+                    edgeFormClickListenerRegistered = true;
+                }, 100);
+            }
         }
     }
     
-    function populateEdgeTypeSelect(sourceNodeType, targetNodeType) {
-        console.log("redawani")
-        const edgeTypeSelect = document.getElementById('edge-type-select');
-        edgeTypeSelect.innerHTML = '';
+    document.getElementById('add-type-button').addEventListener('click', handleAddTypeButtonClick);
+    document.getElementById('remove-type-button').addEventListener('click', handleRemoveTypeButtonClick);
+    document.getElementById('create-edge').addEventListener('click', handleCreateEdgeButtonClick);
+    document.getElementById('select-second-node-button').addEventListener('click', handleSelectSecondNodeButtonClick);
     
-        const possibleEdgeTypes = edgeData.filter(edge => 
-            (edge[1].includes(sourceNodeType) || edge[1].includes(targetNodeType)) &&
-            (edge[2].includes(sourceNodeType) || edge[2].includes(targetNodeType))
-        );
-    
-        for (let edge of possibleEdgeTypes) {
-            const option = document.createElement('option');
-            option.value = edge[0];
-            option.text = edge[0];
-            edgeTypeSelect.appendChild(option);
-        }
-    }
-    
-    // Continue with the rest of your code...
-    
-function showCreateEdgeOrArrowForm(nodeId, arrow) {
-    if (nodeId) {
-        if (arrow ==0){
-            submitButtonCreateEdge.value = "Add Edge"
-        }
-        else {
-            submitButtonCreateEdge.value = "Add Arrow"
-        }
-        const edgeFields = document.getElementById('edge-fields');
-        const edgeExpression = document.getElementById('edge-expression');
-        edgeExpression.value = '';
-        edgeFields.innerHTML = '';
-        addEdgeField('');
-        document.getElementById('add-type-button').addEventListener('click', addEdgeField);
-        document.getElementById('or-button').addEventListener('click', () => {
-            addOperatorField(' | ');
-        });
-
-        document.getElementById('and-button').addEventListener('click', () => {
-            addOperatorField(' & ');
-        });
-
-        document.getElementById('open-parenthesis-button').addEventListener('click', () => {
-            addOperatorField(' ( ');
-        });
-
-        document.getElementById('close-parenthesis-button').addEventListener('click', () => {
-            addOperatorField(' ) ');
-        });
-
-        function addOperatorField(operator) {
-            const operatorSpan = document.createElement('span');
-            operatorSpan.textContent = operator;
-            operatorSpan.dataset.value = operator;
-            edgeFields.appendChild(operatorSpan);
-        }
-
-        function addEdgeField() {
-            const newField = document.createElement('input');
-            newField.type = 'text';
-            newField.name = 'edge_type';
-            newField.placeholder = 'Edge type';
-            edgeFields.appendChild(newField);
-            newField.addEventListener('input', updateEdgeExpression);
-        }
-
-        // function updateEdgeExpression() {
-        //     let expression = '';
-        //     for (let i = 0; i < edgeFields.childNodes.length; i++) {
-        //         const node = edgeFields.childNodes[i];
-        //         if (node.nodeName === 'INPUT' && node.value) {
-        //             expression += node.value;
-        //         } else if (node.nodeName === 'SPAN') {
-        //             expression += node.dataset.value;
-        //         }
-        //         if (i < edgeFields.childNodes.length - 1) {
-        //             expression += ' ';
-        //         }
-        //     }
-        //     edgeExpression.value = expression;
-        // }
-        edgeTypeSelect.addEventListener('change', updateEdgeExpression);
-
-        function updateEdgeExpression() {
-            edgeExpression.value = edgeTypeSelect.value;
-            console.log("si7loulan")
-        }
-
-        if (!edgeFormClickListenerRegistered) {
-            document.addEventListener('click', handleEdgeFormClick);
-            edgeFormClickListenerRegistered = true;
-        }
-            document.getElementById('clear-button').addEventListener('click', () => {
-            edgeExpression.value = '';
-            edgeFields.innerHTML = '';
-            addEdgeField('');  
-        });
-    }
-}
 
 
 // Add event listener to new "Create Edge" button
-document.getElementById("create-edge1").addEventListener('click', function(event) {
-    event.preventDefault();
-    // Hide form
-    edgeDialog.style.display = 'none';
-    // Create edge
-    createEdge(selectedSourceNode, selectedTargetNode, submitButtonCreateEdge.value == "Add Arrow" ? 1 : 0);
-    selectedSourceNode = null;
-    selectedTargetNode = null;
-});
+// document.getElementById("create-edge1").addEventListener('click', function(event) {
+//     event.preventDefault();
+//     // Hide form
+//     edgeDialog.style.display = 'none';
+//     // Create edge
+//     createEdge(selectedSourceNode, selectedTargetNode, submitButtonCreateEdge.value == "Add Arrow" ? 1 : 0);
+//     selectedSourceNode = null;
+//     selectedTargetNode = null;
+// });
 
 
-function createEdge(sourceNodeId, targetNodeId, arrow) {
-    let edgeExpression = document.getElementById('edge-expression').value;
-    var edgeFormule = {
-        arrow: arrow,
-        edge_type: edgeExpression,
-        source_node_id: sourceNodeId.toString(),
-        target_node_id: targetNodeId.toString(),
-        user_id: userId, // Retrieve the user_id from localStorage
 
-    }
-    
-    $.ajax({
-        url: '/api/edges',  // Your API endpoint to create the edge
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(edgeFormule),
-        success: function(response) {
-            try {
-                data.edges.add({
-                    id:edgeFormule.edge_id,
-                    from: edgeFormule.source_node_id, 
-                    to: edgeFormule.target_node_id,
-                    label: edgeFormule.edge_type,
-                    arrows: edgeFormule.arrow == 1 ? 'to' : '',
-                    font: {align: 'middle'}
-                  });
-                dataDisplay2.textContent = "ouioui";
-            } catch (error) {
-                dataDisplay2.textContent = error;
-            }  
-
-
-            // network.setData(data);
-
-            console.log('Success!');
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error('Error: ', textStatus, ', Details: ', errorThrown);
-            console.error('Response: ', jqXHR.responseText);
-        }
-    });
-}
 
 
     
@@ -409,7 +556,7 @@ function createEdge(sourceNodeId, targetNodeId, arrow) {
             contextMenuUpdateItem.addEventListener('click', handleUpdateClick);
             contextMenuCreateEdgeItem.addEventListener('click', handleCreateEdgeClick);
             deleteNodeMenuItem.addEventListener('click', handleDeleteNodeClick); 
-            // contextMenuCreateArrowItem.addEventListener('click', handleCreateArrowClick);
+            contextMenuCreateArrowItem.addEventListener('click', handleCreateArrowClick);
             // add event listener for delete
         }
     }

@@ -57,5 +57,5 @@ for c in edge_list:
 for c in arrow_list:
     a = relation_types(c)
     arrow_data.append([c.__name__, get_type_name(a[0]), get_type_name(a[1])])
-# print(edge_data)
+print(arrow_data)
 

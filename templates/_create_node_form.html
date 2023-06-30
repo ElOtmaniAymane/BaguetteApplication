@@ -1,17 +1,65 @@
-<button id="init-create-node-button">✨ Create Node</button>
-<form id="node-create-form" style="display: none;">
-    <label>
-        <span>Node Name</span>
-        <input name="node_name" type="text" value="" />
-    </label>
 
-    <label>
-        <span>Node Type</span>
-        <input name="node_type" list="node-type-list" type="text" value="" />
-        <datalist id="node-type-list">
-            <!-- Options will be added by JavaScript -->
-        </datalist>
-    </label>
-    <button type="button" id="create-node-button">✨ Submit</button>
-    <button type="button" id="cancel-node-button">❌ Cancel</button>
-</form>
+<div
+  class="modal fade"
+  id="createNodeModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="createNodeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createNodeModalLabel">Create Node</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="node-create-form">
+          <div class="form-group">
+            <label for="node_name">Node Name</label>
+            <input
+              id="node_name"
+              name="node_name"
+              type="text"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="node_type">Node Type</label>
+            <input
+              id="node_type"
+              name="node_type"
+              list="node-type-list"
+              type="text"
+              class="form-control"
+            />
+            <datalist id="node-type-list">
+              <!-- Options will be added by JavaScript -->
+            </datalist>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="cancel-node-button"
+          class="btn btn-danger"
+          data-dismiss="modal"
+        >
+          ❌ Cancel
+        </button>
+        <button type="button" id="create-node-button" class="btn btn-success">
+          ✨ Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
