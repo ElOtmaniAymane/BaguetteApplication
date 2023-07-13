@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.3" version="1.3" xmlns:viz="http://www.gexf.net/1.3/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.3 http://www.gexf.net/1.3/gexf.xsd">
+	<meta lastmodifieddate="2023-07-05">
+		<creator>Graph Builder</creator>
+		<description />
+	</meta>
+	<graph mode="static">
+		<attributes class="node" mode="static">
+			<attribute id="color" title="color" type="string" />
+			<attribute id="condition" title="condition" type="string" />
+			<attribute id="cls" title="cls" type="string" />
+			<attribute id="Type" title="Type" type="string" />
+		</attributes>
+		<attributes class="edge" mode="static">
+			<attribute id="color" title="color" type="string" />
+			<attribute id="condition" title="condition" type="string" />
+			<attribute id="cls" title="cls" type="string" />
+			<attribute id="Type" title="Type" type="string" />
+		</attributes>
+		<nodes>
+			<node id="0" label="Vertex[Data]">
+				<attvalues>
+					<attvalue for="color" value="Color(0.5882352941176471, 1.0, 1.0)" />
+					<attvalue for="condition" value="None" />
+					<attvalue for="cls" value="(&lt;class 'baguette.bakery.source.types.data.entities.Data'&gt;,)" />
+					<attvalue for="Type" value="MetaVertex" />
+				</attvalues>
+				<viz:size value="2.0" />
+				<viz:color r="150" g="255" b="255" />
+			</node>
+			<node id="1" label="Vertex[Diff]">
+				<attvalues>
+					<attvalue for="color" value="Color(0.19607843137254902, 0.5882352941176471, 1.0)" />
+					<attvalue for="condition" value="None" />
+					<attvalue for="cls" value="(&lt;class 'baguette.bakery.source.types.data.entities.Diff'&gt;,)" />
+					<attvalue for="Type" value="MetaVertex" />
+				</attvalues>
+				<viz:size value="2.0" />
+				<viz:color r="50" g="150" b="255" />
+			</node>
+		</nodes>
+		<edges>
+			<edge color="Color(0.39215686274509803, 0.7941176470588236, 1.0)" condition="None" cls="(&lt;class 'baguette.bakery.source.types.filesystem.relations.Conveys'&gt;,)" Type="MetaEdge" source="1" target="0" type="undirected" label="Edge[Conveys]" weight="1.0">
+				<viz:color r="100" g="202" b="255" />
+				<attvalues>
+					<attvalue for="color" value="Color(0.39215686274509803, 0.7941176470588236, 1.0)" />
+					<attvalue for="condition" value="None" />
+					<attvalue for="cls" value="(&lt;class 'baguette.bakery.source.types.filesystem.relations.Conveys'&gt;,)" />
+					<attvalue for="Type" value="MetaEdge" />
+				</attvalues>
+			</edge>
+		</edges>
+	</graph>
+</gexf>

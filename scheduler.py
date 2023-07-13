@@ -7,7 +7,8 @@ from models import GuestUser
 minuteSession = 30
 def delete_expired_guest_users():
     with app.app_context():
-        print(nowdate.utcnow())
+        print( nowdate.utcnow())
+        print("deleted dd")
         expired_time = nowdate.utcnow() - timedelta(minutes=30)
         expired_guest_users = GuestUser.query.filter(GuestUser.time < expired_time).all()
         for guest_user in expired_guest_users:

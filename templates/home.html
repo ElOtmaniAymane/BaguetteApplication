@@ -48,6 +48,7 @@
   <script type="text/javascript" src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
   
   <!-- Include jQuery -->
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"> -->
   <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"> -->
@@ -94,13 +95,15 @@ type="module"
 <script src="{{ url_for('static', filename='js/import.js') }}"></script>
 <script src="{{ url_for('static', filename='js/export.js') }}"></script>
 <script src="{{ url_for('static', filename='js/deleteNode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/searchBaguette.js') }}"></script>
+
 
 <!-- <script src="{{ url_for('static', filename='js/createEdge.js') }}"></script> -->
 <!-- <script src="menu-context.js"></script> --> 
 
 </head>
 
-  <body class="min-h-screen bg-slate-50 dark:bg-black dark:text-white">
+  <body class="min-h-screen bg-slate-50 dark:bg-black ">
     <!-- <header>
         <div class="container-fluid">
             <h1>My App</h1>
@@ -129,15 +132,12 @@ type="module"
               </button>
               <nav class="hidden space-x-8 text-xl sm:block" aria-label="main">
                 <a
-                  href="#Presentation"
+                  href="http://127.0.0.1:8002/build/index.html"
+                  target="_blank"
                   class="shine-link hover:text-pink-600 hover:opacity-100"
                   >Home Page</a
                 >
-                <a
-                  href="#Recherche"
-                  class="shine-link hover:text-pink-600 hover:opacity-100"
-                  >Help</a
-                >
+                <a href="#Recherche" class="shine-link hover:text-pink-600 hover:opacity-100" onclick="openHelpDialog()">Help</a>
                 <a
                   id="logout-button"
                   href="#Contact"
@@ -163,7 +163,7 @@ type="module"
             <div id="notifications">
                 <section class="flex justify-end">
 
-                    <p id="expiry-info" class="text-l font-medium text-right" style="display: none;">Your session will expire in 30 minutes. </p>
+                    <p id="expiry-info" class="text-l mr-2 font-medium text-right dark:text-white" style="display: none;">Your session will expire in 30 minutes. </p>
                     <a id="update-session-btn" href="#" class="text-l font-medium text-pink-600" style="display: none; text-decoration: underline; cursor: pointer;"> Update session</a>          
                 
                 </section>
@@ -195,6 +195,7 @@ type="module"
 
                 {% include "_importbutton.html" %}
                 {% include "_exportbutton.html" %}
+                {% include "_results.html" %}
 
                 {% include "_signin_dialogue.html" %}
                 <div id="edge-dialog" >
@@ -212,13 +213,15 @@ type="module"
                     <!-- Les boutons ici -->
                     <!-- <section class="mx-auto flex-col max-w-7xl items-center justify-between p-4"> -->
 
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-4 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="init-create-node-button">✨ Create Node</button>
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="nodeUpdateButton">✨ Update Node</button>
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-red-600 active:bg-teal-500 dark:border-none" id="delete-node-button">❌ Delete Node</button>
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="create-edge-button">✨ Create Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="init-create-node-button">✨ Create Node</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-pink-600 active:bg-teal-500 dark:border-none" id="nodeUpdateButton">🪄 Update Node</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-red-600 active:bg-red-500 dark:border-none" id="delete-node-button">❌ Delete Node</button>
+                        <button class="border-slate-900 mt-8 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="create-edge-button">✨ Create Edge</button>
                         <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="create-arrow-button">✨ Create Arrow</button>
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="edgeUpdateButton">✨ Update Edge</button>
-                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="edgeDeleteButton">❌ Delete Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-pink-600 active:bg-pink-500 dark:border-none" id="edgeUpdateButton">🪄 Update Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-red-600 active:bg-red-500 dark:border-none" id="edgeDeleteButton">❌ Delete Edge</button>
+                        <button class="border-slate-900 w-40 rounded-xl mt-8 border border-solid bg-pink-700 p-3 text-white hover:bg-red-600 active:bg-orange-500 dark:border-none" id="clear-button">Clear</button>
+
                         <!-- </section> -->
                 </div>
             
@@ -228,8 +231,9 @@ type="module"
             </div>
             <section class="mx-auto mt-4 flex max-w-6xl items-end justify-between p-4">
                 <button class="border-slate-900 w-48 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="export">📥 Export</button>
-                <button class="border-slate-900 w-48 rounded-xl border border-solid bg-pink-700 p-3 text-white hover:bg-red-600 active:bg-orange-500 dark:border-none" id="clear-button">Clear</button>
+                <button class="border-slate-900 w-48 rounded-xl border border-solid  p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none backgr" id="searchBaguette">🔍 Search Matches</button>
                 <button class="border-slate-900 w-48 rounded-xl border border-solid bg-teal-700 p-3 text-white hover:bg-teal-600 active:bg-teal-500 dark:border-none" id="import">📤 Import</button>
+
             </section>
             <!-- Modals -->
 
@@ -316,7 +320,14 @@ type="module"
           // Faites quelque chose lorsque le nœud a fini d'être déplacé
         });
             // Load saved node positions from local storage
-        
+            function openHelpDialog() {
+  document.getElementById("helpDialog").style.display = "block";
+}
+
+function closeHelpDialog() {
+  document.getElementById("helpDialog").style.display = "none";
+}
+
         </script>
                             
     <footer>

@@ -4,6 +4,8 @@ import datetime
 import typing
 import types as ftypes
 from typing import Union, get_args
+import requests
+from flask import json
 from baguette.bakery.source.types.utils import types as ltypes, relations, relation_types
 from baguette.bakery.source import types 
 
@@ -12,7 +14,10 @@ from baguette.bakery.source.config import ColorSetting
 from baguette.bakery.source.graph import Edge, Arrow
 from flask import json
 
+# import_env(globals)
 a = ltypes()
+type_dictionary = {element.__name__: element for element in a}
+# print(a)
 b = [(element.__name__, element.default_color) for element in a]
 # print(b)
 type_color_dict = {name: (color.R, color.G, color.B) for name, color in b}
@@ -29,9 +34,11 @@ for cls in c:
     if issubclass(cls, Arrow):
         arrow_list.append(cls)
         # print(f"{cls} is a subclass of Edge " + str(i))
-    else:
-        edge_list.append(cls)
     
+    edge_list.append(cls)
+    
+arrow_dictionary = {element.__name__ : element for element in arrow_list}
+edge_dictionary = {element.__name__ : element for element in edge_list}
 
 # issubclass(network.relations.HasSocket, Edge)
 # c[0]
@@ -57,5 +64,7 @@ for c in edge_list:
 for c in arrow_list:
     a = relation_types(c)
     arrow_data.append([c.__name__, get_type_name(a[0]), get_type_name(a[1])])
-print(arrow_data)
+# print(edge_data)
 
+c = [element.__name__ for element in ltypes()]
+# print(arrow_dictionnary)

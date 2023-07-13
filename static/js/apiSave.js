@@ -17,23 +17,23 @@
 //                       node_id: node.node_id}  // ajout de node_id dans nodejson
 //         // Si le nœud existe déjà dans la base de données, le mettre à jour
 //         if (JSON.parse(currentNodes).find(function(n) { return n.node_id == node.node_id; })) {
-//             $.ajax({
-//                 url: '/api/nodes/' + node.node_id,  // Votre point de terminaison de l'API pour mettre à jour le nœud
-//                 type: 'PUT',
-//                 contentType: 'application/json',
-//                 data: JSON.stringify(nodejson),
-//                 success: function(response) {
-//                     // Gérer la réponse du serveur
-//                     messageElement.textContent = 'Success1!';
-//                 },
-//                 error: function(jqXHR, textStatus, errorThrown) {
-//                     console.error('Error: ', textStatus, ', Details: ', errorThrown);
-//                     console.error('Response: ', jqXHR.responseText);
+            // $.ajax({
+            //     url: '/api/nodes/' + node.node_id,  // Votre point de terminaison de l'API pour mettre à jour le nœud
+            //     type: 'PUT',
+            //     contentType: 'application/json',
+            //     data: JSON.stringify(nodejson),
+            //     success: function(response) {
+            //         // Gérer la réponse du serveur
+            //         messageElement.textContent = 'Success1!';
+            //     },
+            //     error: function(jqXHR, textStatus, errorThrown) {
+            //         console.error('Error: ', textStatus, ', Details: ', errorThrown);
+            //         console.error('Response: ', jqXHR.responseText);
 
-//                     // Mettre à jour l'élément HTML avec le message d'échec
-//                     messageElement.textContent = 'Failed1!';
-//                 }
-//             });
+            //         // Mettre à jour l'élément HTML avec le message d'échec
+            //         messageElement.textContent = 'Failed1!';
+            //     }
+            // });
 //         }
 //         // Si le nœud n'existe pas dans la base de données, l'ajouter
 //         else {

@@ -10,7 +10,6 @@ var initCreateNodeButton = document.getElementById('init-create-node-button');
 var createNodeButton = document.getElementById('create-node-button');
 var cancelNodeButton = document.getElementById('cancel-node-button');
 var form = document.getElementById('node-create-form');
-const dataDisplay1 = document.getElementById('message');
 var userId = localStorage.getItem('user_id') || localStorage.getItem('guest_id');
 
 // Get the datalist element from the HTML
@@ -107,19 +106,15 @@ createNodeButton.addEventListener('click', function() {
                 success: function(nodeData) {
                     newNodeVis.id = nodeData.node_id;
                     // Add the new node to the vis.js network
-                    try {
-                        data.nodes.add(newNodeVis);
-                        dataDisplay1.textContent = "Node created successfully";
-                    } catch (error) {
-                        dataDisplay1.textContent = error;
-                    } 
+
+                    data.nodes.add(newNodeVis);
+
                     console.log("dsdd" + JSON.stringify(nodesData));
  
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error('Error: ', textStatus, ', Details: ', errorThrown);
                     console.error('Response: ', jqXHR.responseText);
-                    dataDisplay1.textContent = 'Failed to create node!'; 
                 }
             });
 

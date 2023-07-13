@@ -137,7 +137,18 @@ paths:
         - $ref: "#/components/parameters/user_id"
       responses:
         "200":
-          description: "Successfully read node"
+          description: "Successfully exported graph"
+  /users/convert/{user_id}:
+    post:
+      operationId: "users.convertToMetaGraph"
+      tags:
+        - "Users"
+      summary: "search in baguette user's graph"
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          description: "Successfully exported graph"
       
   /nodes:
     get:

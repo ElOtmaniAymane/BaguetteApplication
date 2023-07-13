@@ -7,7 +7,8 @@ document.getElementById('edgeDeleteButton').addEventListener('click', function()
     document.body.style.cursor = 'crosshair';  // Change cursor
     network.once("click", function(params) {
         if (params.edges.length > 0) {
-            var edgeId = params.edges[0];  // Get selected edge ID
+            var edgeId = params.edges[0];  
+            console.log(edgeId);// Get selected edge ID
     
             if (isDeletingEdge) {
                 // Sortir du mode "delete edge"
@@ -16,22 +17,16 @@ document.getElementById('edgeDeleteButton').addEventListener('click', function()
     
                 // Supprimer le edge de votre réseau vis.js
 
-    
-                // Envoyez une requête DELETE à votre API
-                fetch(`/api/edges/${edgeId}`, {
+                $.ajax({
+                    url: `/api/edges/${edgeId}`,
                     method: 'DELETE',
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                    success: function() {
+                      data.edges.remove({ id: edgeId });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                      console.log('There was a problem with your ajax operation: ' + textStatus + ' - ' + errorThrown);
                     }
-                })
-                .then(() => {                    
-                    data.edges.remove({id: edgeId});
-                })
-                .catch(e => {
-                    console.log('There was a problem with your fetch operation: ' + e.message);
-                });
+                  });
             } 
         }
         else {

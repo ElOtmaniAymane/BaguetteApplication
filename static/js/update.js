@@ -7,7 +7,6 @@ const NetworkContextMenu = (function() {
     const nodeDialog = document.getElementById('node-dialog');
     const form = document.getElementById('node-update-form');
     const submitButton = form.querySelector('input[type="submit"]');
-    const dataDisplay1 = document.getElementById('message');
     const dataDisplay2 = document.getElementById('message');
 
     const deleteNodeMenuItem = document.getElementById('deleteNode'); // supposez que vous avez ajouté un id="deleteNode" à votre menu item
@@ -76,9 +75,14 @@ const NetworkContextMenu = (function() {
             
             showUpdateForm(nodeToUse);
             contextMenu.style.display = 'none';
+            console.log("Nodes: ", network.body.data.nodes.getIds()); // Add this
+            console.log("nodeToUse: ", nodeToUse);
             const position = network.getPositions([nodeToUse])[nodeToUse];
-    
+            console.log("position: ", position); // Add this
+
             const DOMPosition = network.canvasToDOM(position);
+            console.log("DOMPosition: ", DOMPosition); // Add this
+
             nodeDialog.style.left = `${DOMPosition.x + 180}px`;
             nodeDialog.style.top = `${DOMPosition.y}px`;
             nodeDialog.style.display = 'block';
@@ -110,12 +114,9 @@ const NetworkContextMenu = (function() {
                 label: `${nodeData.node_name} (${nodeData.node_type})`,
                 color: nodeData.color,
             };
-            try {
+
                 data.nodes.update(newNode);
-                dataDisplay1.textContent = "ouioui";
-            } catch (error) {
-                dataDisplay1.textContent = error;
-            }  
+
     
             // New: Send PUT request to your API
             var updatedNode = {
@@ -131,12 +132,10 @@ const NetworkContextMenu = (function() {
                 success: function(response) {
                     // Handle server response
                     nodeDialog.style.display = 'none';
-                    dataDisplay1.textContent = "Node updated successfully";
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error('Error: ', textStatus, ', Details: ', errorThrown);
                     console.error('Response: ', jqXHR.responseText);
-                    dataDisplay1.textContent = 'Failed to update node!'; 
                 }
             });
         }
@@ -169,22 +168,16 @@ const NetworkContextMenu = (function() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                try {
+
                     // Supprimez d'abord les edges connectés
                     var connectedEdges = network.getConnectedEdges(selectedNode);
                     data.edges.remove(connectedEdges);
         
                     // Ensuite, supprimez le noeud
-                    data.nodes.remove({id: selectedNode});
-                    dataDisplay1.textContent = "ouioui";
-                } catch (error) {
-                    dataDisplay1.textContent = error;
-                }
-                return response.json(); // or .text() or .blob() ...
+                    data.nodes.remove(selectedNode);
             })
             .then(() => {
-                // Ensuite, rechargez votre page ou récupérez de nouvelles données pour mettre à jour votre page
-                location.reload();
+                console.log("success");
             })
             .catch(e => {
                 console.log('There was a problem with your fetch operation: ' + e.message);
@@ -269,8 +262,10 @@ const NetworkContextMenu = (function() {
             data: JSON.stringify(edgeFormule),
             success: function(response) {
                 try {
+                    var edgeId = response.edge_id;
+
                     data.edges.add({
-                        id:edgeFormule.edge_id,
+                        id:edgeId,
                         from: edgeFormule.source_node_id, 
                         to: edgeFormule.target_node_id,
                         label: edgeFormule.edge_type,
@@ -553,7 +548,9 @@ const NetworkContextMenu = (function() {
     return {
         init: function() {
             network.on("oncontext", handleContextMenu);
-            contextMenuUpdateItem.addEventListener('click', handleUpdateClick);
+            contextMenuUpdateItem.addEventListener('click', function() {
+                handleUpdateClick();
+            });
             contextMenuCreateEdgeItem.addEventListener('click', handleCreateEdgeClick);
             deleteNodeMenuItem.addEventListener('click', handleDeleteNodeClick); 
             contextMenuCreateArrowItem.addEventListener('click', handleCreateArrowClick);
